@@ -65,5 +65,32 @@ palos = [putter, madera] ++ map hierro [1..10]
 golpe :: Palo->Jugador->Tiro
 golpe unPalo= unPalo.habilidad 
 
+--3)
+modificarVelocidadTiro :: (Int->Int)->Tiro->Tiro
+modificarVelocidadTiro unaFuncion unTiro = UnTiro {velocidad = unaFuncion.velocidad $unTiro}
+
+modificarPrecisionTiro :: (Int->Int)->Tiro->Tiro
+modificarPrecisionTiro unaFuncion unTiro = UnTiro {precision = unaFuncion.precision $unTiro}
+
+modificarAlturaTiro :: (Int->Int)->Tiro->Tiro
+modificarAlturaTiro unaFuncion unTiro =  UnTiro {altura = unaFuncion.altura $unTiro}
+
+tiroQuedaEnCero :: Tiro->Tiro
+tiroQuedaEnCero = modificarVelocidadTiro (\velocidad->0).modificarPrecisionTiro (\presicion->0).modificarAlturaTiro (\altura->0)
+
+type Obstaculo = Tiro->Tiro
+tunelConRampa :: Obstaculo
+tunelConRampa unTiro
+ | (>90).precision $unTiro = modificarVelocidadTiro (*2).modificarPrecisionTiro (\presicion->100).modificarAlturaTiro (\altura->0) $unTiro
+ | otherwise               =tiroQuedaEnCero unTiro
+
+laguna :: Int->Obstaculo
+laguna largoLaguna unTiro
+ | ((>80).velocidad $unTiro) && (between (altura unTiro) 1 5) = modificarAlturaTiro (\altura->div altura largoLaguna) unTiro
+ | otherwise                                                  = tiroQuedaEnCero unTiro
 
 
+hoyo :: Obstaculo
+hoyo unTiro 
+ |(between (velocidad unTiro) 5 20) && ((>95).precision $unTiro) = tiroQuedaEnCero unTiro
+ |otherwise                                                      = tiroQuedaEnCero unTiro
