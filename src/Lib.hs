@@ -136,5 +136,18 @@ cantidadQueSupera obstaculos =length.(seSuperan obstaculos)
 paloMasUtil :: Jugador->[Obstaculo]->Palo
 paloMasUtil unJugador obstaculos = maximoSegun (cantidadQueSupera obstaculos.(flip golpe unJugador)) palos
 
+--5)
 
+type Resultado = (Jugador, Puntos)
 
+jugador :: Resultado->Jugador
+jugador = fst
+
+puntos :: Resultado -> Puntos
+puntos = snd
+
+perdedores :: [Resultado]->[String]
+perdedores resultados = (map (padre.jugador).filter (perdioApuesta resultados)) resultados
+
+perdioApuesta :: [Resultado]->Resultado->Bool 
+perdioApuesta resultados resultado = all (< (puntos resultado)) (map puntos resultados)
